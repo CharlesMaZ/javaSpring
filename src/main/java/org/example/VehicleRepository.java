@@ -7,12 +7,11 @@ import java.util.Scanner;
 
 public class VehicleRepository implements IVehicleRepository{
     private final List<Vehicle> vehicles;
-    //private String filePath;
-
+    private String filePath;
     public VehicleRepository(String csvPath) {
         this.vehicles = new ArrayList<>();
-        //this.filePath = csvPath;
-        loadFromCsv(csvPath);
+        this.filePath = csvPath;
+        loadFromCsv(filePath);
     }
 
     @Override
@@ -25,16 +24,19 @@ public class VehicleRepository implements IVehicleRepository{
         for (Vehicle vehicle: vehicles) {
             if ( vehicle.rejestracja.equals(id)){
                 if (vehicle.rented){
-                    System.out.println("samochodów wypożyczony, awybierz inny");
+                    System.out.println("pojazd jest aktualnie wypożyczony, wybierz inny");
                 }
                 else {
                     vehicle.rented = true;
-                    System.out.println("Samochód: " + vehicle.model + " został wypożyczony.");
+                    System.out.println("Pojazd: " + vehicle.model + " został przez Ciebie wypożyczony.");
+                    saveToCSV();
                     return vehicle;
                 }
             }
         }
+        saveToCSV();
         return null;
+
     }
 
     @Override
@@ -47,17 +49,20 @@ public class VehicleRepository implements IVehicleRepository{
                 else {
                     vehicle.rented = false;
                     System.out.println("Pojazd " + vehicle.model +" został zwrócony");
+                    saveToCSV();
                     return true;
                 }
             }
         }
+        saveToCSV();
         return false;
     }
 
     @Override
-    public void saveToCSV(List<Vehicle> vehicles, File file) {
+    public void saveToCSV(/*List<Vehicle> vehicles, File file*/) {
+        File file = new File(filePath);
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))){
-            for (Vehicle vehicleObject: vehicles ) {
+            for (Vehicle vehicleObject: vehicles) {
                 bufferedWriter.write(vehicleObject.toCSV());
                 bufferedWriter.newLine();
             }
@@ -65,6 +70,17 @@ public class VehicleRepository implements IVehicleRepository{
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void addVehicle(Vehicle vehicle) {
+
+    }
+
+    @Override
+    public void removeVehicle(Vehicle vehicle) {
+
+    }
+
     public void loadFromCsv(String path){
         File fileCSV = new File(path);
         try (Scanner scanner = new Scanner(fileCSV)){
@@ -72,7 +88,7 @@ public class VehicleRepository implements IVehicleRepository{
                 String line = scanner.nextLine();
                 String[] dataFromCsvLine = line.split(",");
                 if (dataFromCsvLine.length == 7 ){
-                    System.out.println(dataFromCsvLine[0] + dataFromCsvLine[5] + dataFromCsvLine[6]);
+                    //System.out.println(dataFromCsvLine[0] + dataFromCsvLine[5] + dataFromCsvLine[6]);
 
                     Car car = new Car(dataFromCsvLine[0], dataFromCsvLine[1], Integer.parseInt(dataFromCsvLine[2]), Float.parseFloat(dataFromCsvLine[3]), Boolean.parseBoolean(dataFromCsvLine[4]), dataFromCsvLine[5], dataFromCsvLine[6]);
 

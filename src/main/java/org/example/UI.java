@@ -7,16 +7,25 @@ public class UI {
     String filePath = "D:\\studia\\Spring\\rentCar\\src\\main\\java\\org\\example\\vehicles.csv";
     private VehicleRepository vehicleRepository = new VehicleRepository(filePath);
     public void menu() {
+        System.out.println("\nWitamy w wypożyczalni");
         while (true) {
-            System.out.println("Witamy w wypożyczalni");
-            System.out.println("1. Wypożycz auto \n 2.Zwróć auto");
+            //zrobić logowanie,  tylko admin może dodawać i usuwać samochody
+            //admin może przeglądać listy userów i inne szczególy
+            //może dwie klasy menu jedna dla admin druga dla user?
+
+            System.out.println("\n1.Wypożycz auto \n2.Zwróć auto\n3.Wyjdź");
             Scanner scanner = new Scanner(System.in);
             int wybor = scanner.nextInt();
             //stworzyc oniekt wypozyczonego pojazdu
 
             if (wybor == 1) {
-                System.out.println("Baza samochodów");
-                System.out.println(vehicleRepository.getVehicles());
+                System.out.println("Baza samochodów:");
+                for (Vehicle vehicle : vehicleRepository.getVehicles()) {
+                    System.out.println(vehicle.toString());
+                    //System.out.println("");
+                }
+                System.out.println("");
+                //System.out.println(vehicleRepository.getVehicles());
                 scanner.nextLine();
 
                 System.out.println("Podaj rejestracje samochodu do wypożyczenia");
@@ -29,6 +38,10 @@ public class UI {
                 System.out.println("Podaj rejestracje samochodu do zwrocenia");
                 String carId = scanner.nextLine();
                 vehicleRepository.returnCar(vehicleRepository.getVehicles(), carId);
+            }
+            else {
+                System.out.println("Do zobaczenia!");
+                System.exit(0);
             }
         }
     }
