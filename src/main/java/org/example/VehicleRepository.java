@@ -57,7 +57,7 @@ public class VehicleRepository implements IVehicleRepository{
     @Override
     public void saveToCSV(List<Vehicle> vehicles, File file) {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))){
-            for (Vehicle vehicleObject: vehicles) {
+            for (Vehicle vehicleObject: vehicles ) {
                 bufferedWriter.write(vehicleObject.toCSV());
                 bufferedWriter.newLine();
             }
