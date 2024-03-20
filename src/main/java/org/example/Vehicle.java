@@ -19,7 +19,7 @@ public abstract class Vehicle {
         this.price = price;
         this.rented = rented;
         this.VIN = VIN;
-        this.VIN = rejestracja;
+        this.rejestracja = rejestracja;
 
     }
 
