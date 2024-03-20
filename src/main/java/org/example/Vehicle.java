@@ -88,7 +88,7 @@ public abstract class Vehicle {
 //    }
     public String toCSV(){
         //return toCSV(brand, model, year, );
-        return brand + "," + model + "," + year + "," + price + "," + rented + "," + VIN;
+        return brand + "," + model + "," + year + "," + price + "," + rented + "," + VIN + "," + rejestracja;
     }
     public String toString(){
         //return toCSV(brand, model, year, );

@@ -87,6 +87,8 @@ public class VehicleRepository implements IVehicleRepository{
             while (scanner.hasNextLine()){
                 String line = scanner.nextLine();
                 String[] dataFromCsvLine = line.split(",");
+                //System.out.println(dataFromCsvLine.length);
+                //System.out.println(dataFromCsvLine[6]);
                 if (dataFromCsvLine.length == 7 ){
                     //System.out.println(dataFromCsvLine[0] + dataFromCsvLine[5] + dataFromCsvLine[6]);
 

@@ -7,4 +7,8 @@ public class Car extends Vehicle {
         super(brand, model, year, price, rented, VIN, rejestracja);
         //vehicleType = "car";
     }
+    public String toCSV(){
+        //return toCSV(brand, model, year, );
+        return brand + "," + model + "," + year + "," + price + "," + rented + "," + VIN + "," + rejestracja;
+    }
 }

@@ -8,5 +8,9 @@ public class Motorcycle extends Vehicle{
         super(brand, model, year, price, rented, VIN, rejestracja);
         this.kategoria = kategoria;
     }
+    public String toCSV(){
+        //return toCSV(brand, model, year, );
+        return brand + "," + model + "," + year + "," + price + "," + rented + "," + VIN + "," + rejestracja + "," + kategoria;
+    }
 
 }
