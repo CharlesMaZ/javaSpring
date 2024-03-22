@@ -73,12 +73,12 @@ public class VehicleRepository implements IVehicleRepository{
 
     @Override
     public void addVehicle(Vehicle vehicle) {
-
+        vehicles.add(vehicle);
     }
 
     @Override
     public void removeVehicle(Vehicle vehicle) {
-
+        vehicles.remove(vehicle);
     }
 
     public void loadFromCsv(String path){
