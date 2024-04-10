@@ -3,7 +3,7 @@ package org.example;
 import java.util.List;
 
 public interface IUserRepository {
-    List<User> getUser();
+    User getUser(String login);
     List<User> getUsers();
     void save();
 }

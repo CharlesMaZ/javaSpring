@@ -1,5 +1,9 @@
 package org.example;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class User {
     private String login;
     private String password;
@@ -12,7 +16,7 @@ public class User {
         this.login = login;
         this.password = password;
         this.role = role;
-        this.vehicleID = vehicleID;//this.vehicle = vehicle;
+        this.vehicleID = null;//vehicleID;//this.vehicle = vehicle;
 
     }
 
@@ -47,4 +51,6 @@ public class User {
     public void setVehicleID(String vehicleID) {
         this.vehicleID = vehicleID;
     }
+
+
 }

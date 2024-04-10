@@ -10,7 +10,7 @@ public interface IVehicleRepository {
     void saveToCSV(/*List<Vehicle> vehicles, File file*/);
 
     void addVehicle(Vehicle vehicle);
-    void removeVehicle(Vehicle vehicle);
+    void removeVehicle(String rejestracja);
 
 
 

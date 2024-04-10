@@ -3,18 +3,21 @@ package org.example;
 import java.util.List;
 
 public class Authentication {
-    public boolean checkLogin(String login, String pass, List<User> users){
+        public static User login(String login, String hashedPass, List<User> users) throws UserNotFoundException, InvalidPasswordException{
         for (User user : users) {
             if(user.getLogin().equals(login)){
-                if (md5(user.getPassword()).equals(pass)){
-                    return true;
+                if (hashedPass.equals(user.getPassword())){
+                    return user;
+                }
+                else {
+                    throw new InvalidPasswordException("Złe hasełko pani/e");
                 }
             }
         }
-        return false;
+        throw new UserNotFoundException("Nie znaleziono takiego usera");
     }
-    public String md5(String pass){
-        //logika
-        return pass;
-    }
+//    public String md5(String pass){
+//        //logika
+//        return pass;
+//    }
 }

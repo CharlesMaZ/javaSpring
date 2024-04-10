@@ -77,8 +77,13 @@ public class VehicleRepository implements IVehicleRepository{
     }
 
     @Override
-    public void removeVehicle(Vehicle vehicle) {
-        vehicles.remove(vehicle);
+    public void removeVehicle(String rejestracja) {
+        for (Vehicle vehicle: vehicles) {
+            if (vehicle.rejestracja.equals(rejestracja)){
+                vehicles.remove(vehicle);
+
+            }
+        }
     }
 
     public void loadFromCsv(String path){
