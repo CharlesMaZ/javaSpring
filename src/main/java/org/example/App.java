@@ -53,6 +53,7 @@ public class App {
                 //user.setVehicleID(scanner.nextLine());
                 Vehicle rentedVehicle = vehicleRepository.rentCar(vehicleRepository.getVehicles(), carID); //przekazać całegp usera?
                 user.setVehicleID(rentedVehicle.rejestracja);
+                //userRepository.save(); // dokończyć by nie waliło błędami po wyjsciu z programu było w csv info o wypozczyonym samochodzie
                 break;
 
             case 2:
