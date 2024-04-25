@@ -1,1 +1,1 @@
-Java project from intelij
+Car rental in Java Spring Boot
