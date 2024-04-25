@@ -1,172 +1,117 @@
 package org.example;
 
+import org.example.authenticate.Authenticator;
+import org.example.configuration.HibernateUtil;
+import org.example.dao.IUserRepository;
+import org.example.dao.IVehicleRepository;
+import org.example.dao.hibernate.UserDAO;
+import org.example.dao.hibernate.VehicleDAO;
+import org.example.model.Car;
+import org.example.model.User;
+import org.example.model.Vehicle;
+
 import java.util.Scanner;
 
 public class App {
-    String filePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\vehicles.csv";
-    String usersPath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\users.csv";
-    private VehicleRepository vehicleRepository = new VehicleRepository(filePath);
-    //a moze bieżaco przesuzkiwać csv?Wydajnosc pamieciowa przy dużym csv
-    private UserRepository userRepository = new UserRepository(usersPath);
+    public static  User user = null;
+    private final Scanner scanner = new Scanner(System.in);
+    private final IUserRepository iur = UserDAO.getInstance(HibernateUtil.getSessionFactory());
 
-    public void menu() throws UserNotFoundException, InvalidPasswordException {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("\nWitamy w wypożyczalni");
-        System.out.println("--LOGOWANIE--\nPodaj login:");
-        String login = scanner.nextLine();
-        System.out.println("Poddaj hasło:");
+    private final IVehicleRepository ivr = new VehicleDAO(HibernateUtil.getSessionFactory());
 
-        //haslo user - user123, admin - admin123
+    public void run() {
 
-        String passHas = PasswordHasher.hashPassword(scanner.nextLine());
-        User user = Authentication.login(login, passHas, userRepository.getUsers()); //pytanie czy lepiej by Authentication trzymała usera i zwrać się przez pośrednictwo Authenticaton czy trzymac usera w tej klasie?
+        System.out.println("LOG IN: (tets: login: admin pass: admin1234)");
 
-        if (user.getRole().equals("user")) {
-            System.out.println("zalogowano jako użytkownik");
-            while (true) {
-                userMenu(user);
+        user = Authenticator.login(scanner.nextLine(),scanner.nextLine());
+        if(user!=null){
+            System.out.println("logged in!!");
+
+        String response = "";
+        boolean running=true;
+        while(running) {
+
+            System.out.println("-----------MENU------------");
+            System.out.println("00 - show info");
+            System.out.println("01 - show cars");
+            System.out.println("02 - show users");
+            System.out.println("1 - rent car");
+            System.out.println("2 - return car");
+            System.out.println("3 - show car info");
+            System.out.println("6 - add car");
+            System.out.println("7 - remove car");
+            System.out.println("8 - add user");
+            System.out.println("9 - remove user");
+            response = scanner.nextLine();
+            switch (response) {
+                case "00":
+                        user = iur.getUser(user.getLogin());
+                        System.out.println(user);
+                    break;
+                case "01":
+                    for (Vehicle v : ivr.getVehicles()) {
+                        System.out.println(v);
+                    }
+                    break;
+                case "02":
+                    for (User u: iur.getUsers()) {
+                        System.out.println(u);
+                    }
+                    break;
+                case "1":
+                    System.out.println("Rent car by plates:");
+                    String plate = scanner.nextLine();
+                    ivr.rentVehicle(plate,user.getLogin());
+                    user = iur.getUser(user.getLogin());
+                    break;
+                case "2":
+                    System.out.println("function for return car");
+
+                    String plateForReturn = user.getVehicle().getPlate();
+                    ivr.returnVehicle(plateForReturn,user.getLogin());
+                    user = iur.getUser(user.getLogin());
+                    break;
+                case "3":
+                    System.out.println("plates:");
+                    String plateToShow = scanner.nextLine();
+                    System.out.println(ivr.getVehicle(plateToShow));
+
+                    break;
+                case "6":
+                    System.out.println("add car (only) separator is ; String brand, String model, int year, double price, String plate ");
+                    ////Motorcycle(String brand, String model, int year, double price, String plate, String category)
+                    String line = scanner.nextLine();
+                    String[] arr = line.split(";");
+                    System.out.println("what do you want to add? Car/Motrocycle");
+                    line = scanner.nextLine();
+                    if (line.equals("Car")) {
+                        ivr.addVehicle(new Car(arr[0],
+                                        arr[1],
+                                        Integer.parseInt(arr[2]),
+                                        Double.parseDouble(arr[3]),
+                                        arr[4]));
+                    }
+                    break;
+
+                case "7":
+                    System.out.println("remove car, by plate:");
+                    String  removePlate = scanner.nextLine();
+                    ivr.removeVehicle(removePlate);
+                    break;
+                    //TODO: add logic for user add.
+                case "9":
+                    System.out.println("remove user by login:");
+                    String  removeLogin = scanner.nextLine();
+                    iur.removeUser(removeLogin);
+                    break;
+
+                default:
+                    running=false;
+                }
             }
-        } else if (user.getRole().equals("admin")) {
-            System.out.println("zalogowano jako admin");
-            while (true) {
-                adminMenu(user);
-            }
+        }else{
+            System.out.println("Bledne dane!");
         }
+        System.exit(0);
     }
-
-    public void userMenu(User user) {
-        System.out.println("\n1.Wypożycz auto \n2.Zwróć auto\n3.Wyjdź");
-        Scanner scanner = new Scanner(System.in);
-        int wybor = Integer.parseInt(scanner.nextLine());
-        String carId = null;
-
-        switch (wybor) {
-            case 1:
-                System.out.println("Baza samochodów:");
-                for (Vehicle vehicle : vehicleRepository.getVehicles()) {
-                    System.out.println(vehicle.toString());
-                    //System.out.println("");
-                }
-
-                System.out.println("Podaj rejestracje samochodu do wypożyczenia");
-                String carID = scanner.nextLine();
-                //user.setVehicleID(scanner.nextLine());
-                Vehicle rentedVehicle = vehicleRepository.rentCar(vehicleRepository.getVehicles(), carID); //przekazać całegp usera?
-                user.setVehicleID(rentedVehicle.rejestracja);
-                //userRepository.save(); // dokończyć by nie waliło błędami po wyjsciu z programu było w csv info o wypozczyonym samochodzie
-                break;
-
-            case 2:
-                if (user.getVehicleID() != null) {
-                    vehicleRepository.returnCar(vehicleRepository.getVehicles(), user.getVehicleID());
-                    user.setVehicleID(null);
-
-                } else {
-                    System.out.println("nie masz wypożyczonego samochodu");
-                }
-                break;
-            case 3:
-                System.out.println("Do zobaczenia!");
-                System.exit(0);
-
-        }
-    }
-
-    public void adminMenu(User user) {
-        System.out.println("\n1.Wypożycz auto \n2.Zwróć auto\n3.Dodaj car\n4. Dodaj motorcycle\n5. Usuń pojazd\n6. Lista userów\n7.Lista pojazdów\n8.Wyjdź");
-        Scanner scanner = new Scanner(System.in);
-        int wybor = Integer.parseInt(scanner.nextLine());
-        //String carId = null;
-        //Vehicle rentedVehicle;
-
-        switch (wybor) {
-            case 1:
-                System.out.println("Baza samochodów:");
-                for (Vehicle vehicle : vehicleRepository.getVehicles()) {
-                    System.out.println(vehicle.toString());
-                    //System.out.println("");
-                }
-
-                System.out.println("Podaj rejestracje samochodu do wypożyczenia");
-                user.setVehicleID(scanner.nextLine());
-                //rentedVehicle = vehicleRepository.rentCar(vehicleRepository.getVehicles(), carId);
-                break;
-
-            case 2:
-                if (user.getVehicleID() != null) {
-                    vehicleRepository.returnCar(vehicleRepository.getVehicles(), user.getVehicleID());
-                    user.setVehicleID(null);
-
-                } else {
-                    System.out.println("nie masz wypożyczonego samochodu");
-                }
-                break;
-
-            case 3:
-                System.out.println("Podaj brand");
-                String brand = scanner.nextLine();
-
-                System.out.println("Podaj model");
-                String model = scanner.nextLine();
-
-                System.out.println("Podaj year");
-                int year = Integer.parseInt(scanner.nextLine());
-
-                System.out.println("Podaj price");
-                float price = Float.parseFloat(scanner.nextLine());
-
-                System.out.println("Podaj VIN");
-                String VIN = scanner.nextLine();
-
-                System.out.println("Podaj rejestracje");
-                String rejestracja = scanner.nextLine();
-
-                Vehicle newVehicle = new Car(brand, model,year,price,false, VIN,rejestracja);
-                vehicleRepository.addVehicle(newVehicle);
-                break;
-
-            case 4:
-                System.out.println("Podaj brand");
-                String mbrand = scanner.nextLine();
-
-                System.out.println("Podaj model");
-                String mmodel = scanner.nextLine();
-
-                System.out.println("Podaj year");
-                int myear = Integer.parseInt(scanner.nextLine());
-
-                System.out.println("Podaj price");
-                float mprice = Float.parseFloat(scanner.nextLine());
-
-                System.out.println("Podaj VIN");
-                String mVIN = scanner.nextLine();
-
-                System.out.println("Podaj rejestracje");
-                String mrejestracja = scanner.nextLine();
-
-                System.out.println("Podaj kategorię");
-                String kat = scanner.nextLine();
-
-                Vehicle mnewVehicle = new Motorcycle(mbrand, mmodel,myear,mprice,false, mVIN,mrejestracja,kat);
-                vehicleRepository.addVehicle(mnewVehicle);
-                break;
-
-            case 5:
-                System.out.println("Podaj rejestrację pojazdu do usuniecia:");
-                String rej = scanner.nextLine();
-                vehicleRepository.removeVehicle(rej);
-                break;
-            case 6:
-                System.out.println(userRepository);
-                break;
-            case 7:
-                System.out.println(vehicleRepository);
-                break;
-
-            case 8:
-                System.out.println("Do zobaczenia!");
-                System.exit(0);
-        }
-    }
-
 }
